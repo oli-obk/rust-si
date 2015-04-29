@@ -1,4 +1,5 @@
 ![Travis](https://travis-ci.org/oli-obk/rust-si.svg)
+[![Latest Version](https://img.shields.io/crates/v/text_io.svg)](https://crates.io/crates/text_io)
 
 Don't forget to add the plugin to your crate:
 
