@@ -1,5 +1,5 @@
 [package]
-name = "si"
+name = "text_io"
 version = "0.0.1"
 authors = ["Oliver Schneider <rust-si1949781094849131978611@oli-obk.de>"]
 description = "really simple to use panicking input functions"
@@ -7,3 +7,11 @@ homepage = "https://github.com/oli-obk/rust-si"
 repository = "https://github.com/oli-obk/rust-si"
 readme = "README.md"
 keywords = ["io", "read", "readline"]
+
+[lib]
+name = "text_io"
+crate-type = ["dylib"]
+
+[dependencies]
+quasi = "*"
+quasi_macros = "*"
