@@ -1,8 +1,8 @@
-fn test_str(s: &str) {
+fn test_str(exe: &str, s: &str) {
     use std::process::{Command, Stdio};
     use std::io::Write;
     use std::str::from_utf8;
-    let mut cmd = Command::new("test_tuple")
+    let mut cmd = Command::new(exe)
         .stdin(Stdio::piped())
         .stderr(Stdio::piped())
         .stdout(Stdio::piped())
@@ -18,16 +18,21 @@ fn test_str(s: &str) {
 
 #[test]
 fn run() {
-    test_str("42, 99, Ä");
+    test_str("test_tuple", "42, 99, Ä");
 }
 
 #[test]
 fn run2() {
-    test_str("42,\t99,\nÄ");
+    test_str("test_tuple", "42,\t99,\nÄ");
 }
 
 #[test]
 #[should_panic]
 fn run_fail() {
-    test_str("42,99, Ä");
+    test_str("test_tuple", "42,99, Ä");
+}
+
+#[test]
+fn run_read() {
+    test_str("test_read", "the answer™: 42");
 }
