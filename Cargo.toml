@@ -11,7 +11,7 @@ license-file = "LICENSE"
 
 [lib]
 name = "text_io"
-crate-type = ["dylib"]
+plugin = true
 
 [dependencies]
 quasi = "*"
