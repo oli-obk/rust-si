@@ -8,7 +8,9 @@ fn test_str(exe: &str, s: &str) {
         .stdout(Stdio::piped())
         .spawn()
         .unwrap();
+    println!("started cmd");
     write!(cmd.stdin.as_mut().unwrap(), "{}", s).unwrap();
+    println!("wrote to stdin");
     let res = cmd.wait_with_output().unwrap();
     println!("stdout: {}", from_utf8(&res.stdout).unwrap());
     println!("stderr: {}", from_utf8(&res.stderr).unwrap());
