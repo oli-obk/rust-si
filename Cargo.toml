@@ -6,7 +6,7 @@ description = "really simple to use panicking input functions"
 homepage = "https://github.com/oli-obk/rust-si"
 repository = "https://github.com/oli-obk/rust-si"
 readme = "README.md"
-keywords = ["io", "read", "readline"]
+keywords = ["io", "read", "readline", "scan", "scanf"]
 license-file = "LICENSE"
 
 [lib]
