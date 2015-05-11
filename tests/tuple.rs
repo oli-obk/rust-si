@@ -21,22 +21,22 @@ fn test_str(exe: &str, s: &str) {
 #[test]
 #[cfg(nightly)]
 fn run() {
-    test_str("test_tuple", "42, 99, Ä");
+    test_str("target/debug/test_tuple", "42, 99, Ä");
 }
 
 #[test]
 #[cfg(nightly)]
 fn run2() {
-    test_str("test_tuple", "42,\t99,\nÄ");
+    test_str("target/debug/test_tuple", "42,\t99,\nÄ");
 }
 
 #[test]
 #[should_panic]
 fn run_fail() {
-    test_str("test_tuple", "42,99, Ä");
+    test_str("target/debug/test_tuple", "42,99, Ä");
 }
 
 #[test]
 fn run_read() {
-    test_str("test_read", "the answer™: 42");
+    test_str("target/debug/test_read", "the answer™: 42");
 }
