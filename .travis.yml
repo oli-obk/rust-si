@@ -6,4 +6,4 @@ matrix:
     - rust: beta
       env: FEATURES=''
 script:
-   - cargo test --features "$FEATURES"
+   - cargo test --verbose --features "$FEATURES"
