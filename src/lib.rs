@@ -1,19 +1,29 @@
-#![feature(plugin_registrar, rustc_private, plugin, slice_patterns)]
-#![plugin(quasi_macros)]
+#![cfg_attr(nightly, feature(plugin_registrar, rustc_private, plugin, slice_patterns))]
+#![cfg_attr(nightly, plugin(quasi_macros))]
 
+#[cfg(nightly)]
 extern crate syntax;
+#[cfg(nightly)]
 extern crate quasi;
+#[cfg(nightly)]
 extern crate rustc;
-
+#[cfg(nightly)]
 use std::fmt::Write;
 
+#[cfg(nightly)]
 use syntax::codemap::{Span, BytePos};
+#[cfg(nightly)]
 use syntax::parse::token;
+#[cfg(nightly)]
 use syntax::ast::{TokenTree, TtToken, TtDelimited, TtSequence, Ident};
+#[cfg(nightly)]
 use syntax::ext::base::{ExtCtxt, MacResult, DummyResult, MacEager};
+#[cfg(nightly)]
 use syntax::ext::build::AstBuilder;  // trait for expr_usize
+#[cfg(nightly)]
 use rustc::plugin::Registry;
 
+#[cfg(nightly)]
 fn expand_read(cx: &mut ExtCtxt, sp: Span, args: &[TokenTree])
         -> Box<MacResult + 'static> {
 
@@ -69,20 +79,7 @@ fn expand_read(cx: &mut ExtCtxt, sp: Span, args: &[TokenTree])
                     let next = text.next().unwrap_or(b' ');
                     sp.lo = sp.lo + BytePos(1);
                     stmts.push(quote_stmt!(cx,
-                        let txt = {
-                            let next = [$next];
-                            let next: &[u8] = match next[0] {
-                                b'\n'
-                                | b'\r'
-                                | b'\t'
-                                | b' ' => b"\t\r\n ",
-                                _ => &next,
-                            };
-                            stdin.by_ref()
-                                 .map(|c| c.unwrap())
-                                 .take_while(|c| !next.contains(c))
-                                 .collect::<Vec<u8>>()
-                        };
+                        let txt = read_until($next, &mut stdin);
                     ).unwrap());
                     let mut name = "tup".to_string();
                     name.write_fmt(format_args!("{}", n)).unwrap();
@@ -125,7 +122,85 @@ fn expand_read(cx: &mut ExtCtxt, sp: Span, args: &[TokenTree])
     MacEager::expr(cx.expr_block(cx.block(sp, stmts, Some(expr))))
 }
 
+#[cfg(nightly)]
 #[plugin_registrar]
 pub fn plugin_registrar(reg: &mut Registry) {
     reg.register_macro("read", expand_read);
+}
+
+
+///////////////////////////////////////////////////////////////////////////////////////////////
+//BBB  EEEE TTTTT   A     /////////////////////////////////////////////////////////////////////
+//B  B E      T    A A    /////////////////////////////////////////////////////////////////////
+//BBB  EEE    T   A   A   /////////////////////////////////////////////////////////////////////
+//B  B E      T  AAAAAAA  /////////////////////////////////////////////////////////////////////
+//BBB  EEEE   T A       A /////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////
+
+#[cfg(not(nightly))]
+#[macro_export]
+macro_rules! read(
+    () => {{
+        use std::io::Read;
+        use std::str::{FromStr, from_utf8};
+        let stdin = std::io::stdin();
+        let mut stdin = stdin.lock().bytes();
+        let v = $crate::read_until(b' ', &mut stdin);
+        FromStr::from_str(from_utf8(&v).unwrap()).unwrap()
+    }};
+    ($text:expr) => {{
+        use std::io::Read;
+        use std::str::{FromStr, from_utf8};
+        let stdin = std::io::stdin();
+        let mut stdin = stdin.lock().bytes();
+        let mut text = $text.bytes();
+        let mut val = None;
+        while let Some(c) = text.next() {
+            match c {
+                b'{' => match text.next().unwrap() {
+                    b'{' => $crate::is_char(b'{', &mut stdin),
+                    b'}' => {
+                        let next = text.next().unwrap_or(b' ');
+                        let v = $crate::read_until(next, &mut stdin);
+                        val = Some(FromStr::from_str(from_utf8(&v).unwrap()).unwrap());
+                    }
+                    _ => panic!("found bad curly brace"),
+                },
+                c => $crate::is_char(c, &mut stdin),
+            }
+        }
+        for c in text {
+            $crate::is_char(c, &mut stdin);
+        }
+        val.unwrap()
+    }};
+);
+
+// public until macros can ref private items
+pub fn read_until<I: Iterator<Item=std::io::Result<u8>>>(c: u8, it: &mut I) -> Vec<u8> {
+    let next = [c];
+    let next: &[u8] = match next[0] {
+        b'\n'
+        | b'\r'
+        | b'\t'
+        | b' ' => b"\t\r\n ",
+        _ => &next,
+    };
+    it.by_ref()
+      .map(|c| c.unwrap())
+      .take_while(|c| !next.contains(c))
+      .collect::<Vec<u8>>()
+}
+
+// public until macros can ref private items
+pub fn is_char<I: Iterator<Item=std::io::Result<u8>>>(c: u8, it: &mut I) {
+    let nex = [c];
+    let n: &[u8] = match nex[0] {
+        b'\n'
+        | b'\r'
+        | b'\t'
+        | b' ' => b"\t\r\n ",
+        _ => &nex,
+    };
+    assert!(n.contains(&it.next().unwrap().unwrap()));
 }

@@ -19,11 +19,13 @@ fn test_str(exe: &str, s: &str) {
 }
 
 #[test]
+#[cfg(nightly)]
 fn run() {
     test_str("test_tuple", "42, 99, Ä");
 }
 
 #[test]
+#[cfg(nightly)]
 fn run2() {
     test_str("test_tuple", "42,\t99,\nÄ");
 }

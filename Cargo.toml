@@ -13,6 +13,13 @@ license-file = "LICENSE"
 name = "text_io"
 plugin = true
 
-[dependencies]
-quasi = "*"
-quasi_macros = "*"
+[features]
+nightly = ["quasi", "quasi_macros"]
+
+[dependencies.quasi]
+version = "*"
+optional = true
+
+[dependencies.quasi_macros]
+version = "*"
+optional = true

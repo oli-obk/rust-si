@@ -1,1 +1,13 @@
 language: rust
+rust:
+  - nightly
+  - beta
+
+matrix:
+  include:
+    - rust: nightly
+      env: FEATURES=nightly
+    - rust: beta
+      env: FEATURES=''
+script:
+   - cargo build --features "$FEATURES"
