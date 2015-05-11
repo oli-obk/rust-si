@@ -1,6 +1,7 @@
-#![cfg_attr(nightly, feature(plugin))]
-#![cfg_attr(nightly, plugin(text_io))]
-#[cfg_attr(not(nightly), macro_use(read))]
+#![cfg_attr(feature="nightly", feature(plugin))]
+#![cfg_attr(feature="nightly", plugin(text_io))]
+#[cfg_attr(not(feature="nightly"), macro_use(read))]
+#[cfg(not(feature="nightly"))]
 extern crate text_io;
 
 fn main() {

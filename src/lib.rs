@@ -1,29 +1,29 @@
-#![cfg_attr(nightly, feature(plugin_registrar, rustc_private, plugin, slice_patterns))]
-#![cfg_attr(nightly, plugin(quasi_macros))]
+#![cfg_attr(feature="nightly", feature(plugin_registrar, rustc_private, plugin, slice_patterns))]
+#![cfg_attr(feature="nightly", plugin(quasi_macros))]
 
-#[cfg(nightly)]
+#[cfg(feature="nightly")]
 extern crate syntax;
-#[cfg(nightly)]
+#[cfg(feature="nightly")]
 extern crate quasi;
-#[cfg(nightly)]
+#[cfg(feature="nightly")]
 extern crate rustc;
-#[cfg(nightly)]
+#[cfg(feature="nightly")]
 use std::fmt::Write;
 
-#[cfg(nightly)]
+#[cfg(feature="nightly")]
 use syntax::codemap::{Span, BytePos};
-#[cfg(nightly)]
+#[cfg(feature="nightly")]
 use syntax::parse::token;
-#[cfg(nightly)]
+#[cfg(feature="nightly")]
 use syntax::ast::{TokenTree, TtToken, TtDelimited, TtSequence, Ident};
-#[cfg(nightly)]
+#[cfg(feature="nightly")]
 use syntax::ext::base::{ExtCtxt, MacResult, DummyResult, MacEager};
-#[cfg(nightly)]
+#[cfg(feature="nightly")]
 use syntax::ext::build::AstBuilder;  // trait for expr_usize
-#[cfg(nightly)]
+#[cfg(feature="nightly")]
 use rustc::plugin::Registry;
 
-#[cfg(nightly)]
+#[cfg(feature="nightly")]
 fn expand_read(cx: &mut ExtCtxt, sp: Span, args: &[TokenTree])
         -> Box<MacResult + 'static> {
 
@@ -78,8 +78,22 @@ fn expand_read(cx: &mut ExtCtxt, sp: Span, args: &[TokenTree])
                 b'}' => {
                     let next = text.next().unwrap_or(b' ');
                     sp.lo = sp.lo + BytePos(1);
+                    // compiler plugin + library = not good idea -> can't use read_until here...
                     stmts.push(quote_stmt!(cx,
-                        let txt = read_until($next, &mut stdin);
+                        let txt = {
+                            let next = [$next];
+                            let next: &[u8] = match next[0] {
+                                b'\n'
+                                | b'\r'
+                                | b'\t'
+                                | b' ' => b"\t\r\n ",
+                                _ => &next,
+                            };
+                            stdin.by_ref()
+                                 .map(|c| c.unwrap())
+                                 .take_while(|c| !next.contains(c))
+                                 .collect::<Vec<u8>>()
+                    };
                     ).unwrap());
                     let mut name = "tup".to_string();
                     name.write_fmt(format_args!("{}", n)).unwrap();
@@ -122,7 +136,7 @@ fn expand_read(cx: &mut ExtCtxt, sp: Span, args: &[TokenTree])
     MacEager::expr(cx.expr_block(cx.block(sp, stmts, Some(expr))))
 }
 
-#[cfg(nightly)]
+#[cfg(feature="nightly")]
 #[plugin_registrar]
 pub fn plugin_registrar(reg: &mut Registry) {
     reg.register_macro("read", expand_read);
@@ -137,7 +151,7 @@ pub fn plugin_registrar(reg: &mut Registry) {
 //BBB  EEEE   T A       A /////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////
 
-#[cfg(not(nightly))]
+#[cfg(not(feature="nightly"))]
 #[macro_export]
 macro_rules! read(
     () => {{
