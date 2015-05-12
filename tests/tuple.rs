@@ -25,8 +25,8 @@ fn run() {
 }
 
 #[test]
-#[cfg(feature="nightly")]
-fn run2() {
+#[should_panic]
+fn no_ws_replacement() {
     test_str("target/debug/test_tuple", "42,\t99,\nÄ");
 }
 

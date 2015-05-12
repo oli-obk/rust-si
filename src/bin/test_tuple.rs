@@ -5,12 +5,12 @@
 extern crate text_io;
 
 #[cfg(feature="nightly")]
-fn main() {
+pub fn main() {
     let tup: (i32, i8, String) = read!("{}, {}, {}");
     assert_eq!(tup, (42, 99, "Ä".to_string()));
 }
 
 #[cfg(not(feature="nightly"))]
-fn main() {
+pub fn main() {
     unimplemented!()
 }

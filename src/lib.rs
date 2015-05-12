@@ -11,7 +11,7 @@ extern crate rustc;
 use std::fmt::Write;
 
 #[cfg(feature="nightly")]
-use syntax::codemap::{Span, BytePos};
+use syntax::codemap::{Span, BytePos, Spanned};
 #[cfg(feature="nightly")]
 use syntax::parse::token;
 #[cfg(feature="nightly")]
@@ -76,24 +76,23 @@ fn expand_read(cx: &mut ExtCtxt, sp: Span, args: &[TokenTree])
                     sp.lo = sp.lo + BytePos(2);
                 },
                 b'}' => {
-                    let next = text.next().unwrap_or(b' ');
+                    let next = text.next().map(|c| [c]);
+                    let next: &[u8] = match &next {
+                        &Some(ref c) => c,
+                        &None => b"\t\r\n ",
+                    };
                     sp.lo = sp.lo + BytePos(1);
+                    let next = syntax::ast::LitBinary(std::rc::Rc::new(next.iter().cloned().collect()));
+                    let next = Spanned {
+                        node: next,
+                        span: sp,
+                    };
                     // compiler plugin + library = not good idea -> can't use read_until here...
                     stmts.push(quote_stmt!(cx,
-                        let txt = {
-                            let next = [$next];
-                            let next: &[u8] = match next[0] {
-                                b'\n'
-                                | b'\r'
-                                | b'\t'
-                                | b' ' => b"\t\r\n ",
-                                _ => &next,
-                            };
-                            stdin.by_ref()
-                                 .map(|c| c.unwrap())
-                                 .take_while(|c| !next.contains(c))
-                                 .collect::<Vec<u8>>()
-                    };
+                        let txt = stdin.by_ref()
+                                       .map(|c| c.unwrap())
+                                       .take_while(|c| !$next.contains(c))
+                                       .collect::<Vec<u8>>();
                     ).unwrap());
                     let mut name = "tup".to_string();
                     name.write_fmt(format_args!("{}", n)).unwrap();
@@ -114,17 +113,7 @@ fn expand_read(cx: &mut ExtCtxt, sp: Span, args: &[TokenTree])
             _ => {}
         }
         stmts.push(quote_stmt!(cx,
-            {
-                let nex = [$c];
-                let n: &[u8] = match nex[0] {
-                    b'\n'
-                    | b'\r'
-                    | b'\t'
-                    | b' ' => b"\t\r\n ",
-                    _ => &nex,
-                };
-                assert!(n.contains(&stdin.next().unwrap().unwrap()));
-            }
+            assert_eq!($c, stdin.next().unwrap().unwrap());
         ).unwrap());
     }
 
@@ -174,7 +163,11 @@ macro_rules! read(
                 b'{' => match text.next().unwrap() {
                     b'{' => $crate::is_char(b'{', &mut stdin),
                     b'}' => {
-                        let next = text.next().unwrap_or(b' ');
+                        let next = text.next().map(|c| [c]);
+                        let next: &[u8] = match &next {
+                            &Some(ref c) => c,
+                            &None => b"\t\r\n ",
+                        };
                         let v = $crate::read_until(next, &mut stdin);
                         val = Some(FromStr::from_str(from_utf8(&v).unwrap()).unwrap());
                     }
@@ -191,15 +184,7 @@ macro_rules! read(
 );
 
 // public until macros can ref private items
-pub fn read_until<I: Iterator<Item=std::io::Result<u8>>>(c: u8, it: &mut I) -> Vec<u8> {
-    let next = [c];
-    let next: &[u8] = match next[0] {
-        b'\n'
-        | b'\r'
-        | b'\t'
-        | b' ' => b"\t\r\n ",
-        _ => &next,
-    };
+pub fn read_until<I: Iterator<Item=std::io::Result<u8>>>(next: &[u8], it: &mut I) -> Vec<u8> {
     it.by_ref()
       .map(|c| c.unwrap())
       .take_while(|c| !next.contains(c))
@@ -208,13 +193,5 @@ pub fn read_until<I: Iterator<Item=std::io::Result<u8>>>(c: u8, it: &mut I) -> V
 
 // public until macros can ref private items
 pub fn is_char<I: Iterator<Item=std::io::Result<u8>>>(c: u8, it: &mut I) {
-    let nex = [c];
-    let n: &[u8] = match nex[0] {
-        b'\n'
-        | b'\r'
-        | b'\t'
-        | b' ' => b"\t\r\n ",
-        _ => &nex,
-    };
-    assert!(n.contains(&it.next().unwrap().unwrap()));
+    assert_eq!(c, it.next().unwrap().unwrap());
 }
