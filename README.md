@@ -4,14 +4,23 @@
 Don't forget to add the plugin to your crate:
 
 ```rust
+#[macro_use] extern crate text_io;
+```
+
+If you are on nightly and wish to parse multiple values
+in one `read` invocation, you need to replace the import with
+
+```rust
 #![feature(plugin)]
 #![plugin(text_io)]
 ```
 
-And on beta:
+and enable the cargo feature `nightly`
 
-```rust
-#[macro_use] extern crate text_io;
+```toml
+[dependencies.text_io]
+version = "*"
+features = ["nightly"]
 ```
 
 #Examples
