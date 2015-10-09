@@ -40,3 +40,8 @@ fn run_fail() {
 fn run_read() {
     test_str("target/debug/test_read", "the answer™: 42");
 }
+
+#[test]
+fn run_read_simple() {
+    test_str("target/debug/test_read_simple", "99\n");
+}

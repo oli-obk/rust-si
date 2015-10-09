@@ -148,7 +148,7 @@ macro_rules! read(
         use std::str::{FromStr, from_utf8};
         let stdin = std::io::stdin();
         let mut stdin = stdin.lock().bytes();
-        let v = $crate::read_until(b' ', &mut stdin);
+        let v = $crate::read_until(b"\t\r\n ", &mut stdin);
         FromStr::from_str(from_utf8(&v).unwrap()).unwrap()
     }};
     ($text:expr) => {{
