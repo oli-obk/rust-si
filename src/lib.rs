@@ -1,3 +1,42 @@
+//! This crate allows one-liners to read from a terminal
+//! A minimal example to get an i32 from the command line is
+//!
+//! ```rust
+//! #[macro_use] extern crate text_io;
+//! fn main() {
+//!     let i: i32 = read!();
+//! }
+//! ```
+//!
+//! The `read!()` macro will always read until the next ascii whitespace character
+//! (`\n`, `\r`, `\t` or space).
+//!
+//! Any type that implements the `FromStr` trait can be read with the `read!` macro.
+//!
+//! # Advanced
+//! Text parsing can be done similar to `println!` by adding a format string
+//! to the macro:
+//!
+//! ```rust
+//! let i: i32 = read!("The answer: {}!");
+//! ```
+//!
+//! This will read `"The answer: "`, then an integer, then an exclamation mark. Any deviation from
+//! the format string will result in a panic.
+//!
+//! Note: only a single value can be read per `read!` invocation. If you want more complex input
+//! you need to either use multiple `read!` invocations or use the nightly compiler
+//!
+//! # Expert (nightly)
+//! If you compile with nightly, you can enable the cargo feature `nightly` in your `Cargo.toml`:
+//!
+//! ```toml
+//! [dependencies]
+//! text_io = { version = "*", features = ["nightly"] }
+//! ```
+//!
+//! Now you can add an arbitrary number of `{}` to your format string.
+
 #![cfg_attr(feature="nightly", feature(plugin_registrar, rustc_private, plugin, slice_patterns))]
 #![cfg_attr(feature="nightly", plugin(quasi_macros))]
 
@@ -141,6 +180,7 @@ pub fn plugin_registrar(reg: &mut Registry) {
 ///////////////////////////////////////////////////////////////////////////////////////////////
 
 #[cfg(not(feature="nightly"))]
+/// All text input is handled through this macro
 #[macro_export]
 macro_rules! read(
     () => {{
@@ -183,7 +223,8 @@ macro_rules! read(
     }};
 );
 
-// public until macros can ref private items
+/// This function is a hack until macros can reference private items
+#[doc(hidden)]
 pub fn read_until<I: Iterator<Item=std::io::Result<u8>>>(next: &[u8], it: &mut I) -> Vec<u8> {
     it.by_ref()
       .map(|c| c.unwrap())
@@ -191,7 +232,8 @@ pub fn read_until<I: Iterator<Item=std::io::Result<u8>>>(next: &[u8], it: &mut I
       .collect::<Vec<u8>>()
 }
 
-// public until macros can ref private items
+/// This function is a hack until macros can reference private items
+#[doc(hidden)]
 pub fn is_char<I: Iterator<Item=std::io::Result<u8>>>(c: u8, it: &mut I) {
     assert_eq!(c, it.next().unwrap().unwrap());
 }
