@@ -184,18 +184,14 @@ pub fn plugin_registrar(reg: &mut Registry) {
 #[macro_export]
 macro_rules! read(
     () => { read!("{}") };
-    ($text:expr) => {{
+    ($text:expr) => { read!($text, std::io::stdin().bytes().map(|c| c.unwrap())) };
+    ($text:expr, $input:expr) => {{
         use std::io::Read;
         use std::str::{FromStr, from_utf8};
-        // create the standard input handle
-        let stdin = std::io::stdin();
-        // turn the stdin into an iterator that panics when it meets an Err
-        //let mut stdin = stdin.lock().chars().map(|c| c.unwrap());
-        // sadly .chars() is not stable yet
-        // lets hack our own iterator
-        let mut stdin = stdin.lock().bytes().map(|c| c.unwrap());
         // typesafe macros :)
         let text: &'static str = $text;
+        let stdin: &mut Iterator<Item = u8> = &mut ($input);
+
         let mut text = text.bytes();
         let value;
         loop { match text.next() {
@@ -208,6 +204,9 @@ macro_rules! read(
                     };
                     let s = std::str::from_utf8(&s).unwrap();
                     value = FromStr::from_str(s).unwrap();
+                    for c in text {
+                        assert_eq!(Some(c), stdin.next());
+                    }
                     break;
                 }
                 Some(_) => panic!("found bad curly brace"),
