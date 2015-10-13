@@ -183,57 +183,39 @@ pub fn plugin_registrar(reg: &mut Registry) {
 /// All text input is handled through this macro
 #[macro_export]
 macro_rules! read(
-    () => {{
-        use std::io::Read;
-        use std::str::{FromStr, from_utf8};
-        let stdin = std::io::stdin();
-        let mut stdin = stdin.lock().bytes();
-        let v = $crate::read_until(b"\t\r\n ", &mut stdin);
-        FromStr::from_str(from_utf8(&v).unwrap()).unwrap()
-    }};
+    () => { read!("{}") };
     ($text:expr) => {{
         use std::io::Read;
         use std::str::{FromStr, from_utf8};
+        // create the standard input handle
         let stdin = std::io::stdin();
-        let mut stdin = stdin.lock().bytes();
-        let mut text = $text.bytes();
-        let mut val = None;
-        while let Some(c) = text.next() {
-            match c {
-                b'{' => match text.next().unwrap() {
-                    b'{' => $crate::is_char(b'{', &mut stdin),
-                    b'}' => {
-                        let next = text.next().map(|c| [c]);
-                        let next: &[u8] = match &next {
-                            &Some(ref c) => c,
-                            &None => b"\t\r\n ",
-                        };
-                        let v = $crate::read_until(next, &mut stdin);
-                        val = Some(FromStr::from_str(from_utf8(&v).unwrap()).unwrap());
-                    }
-                    _ => panic!("found bad curly brace"),
-                },
-                c => $crate::is_char(c, &mut stdin),
-            }
-        }
-        for c in text {
-            $crate::is_char(c, &mut stdin);
-        }
-        val.unwrap()
+        // turn the stdin into an iterator that panics when it meets an Err
+        //let mut stdin = stdin.lock().chars().map(|c| c.unwrap());
+        // sadly .chars() is not stable yet
+        // lets hack our own iterator
+        let mut stdin = stdin.lock().bytes().map(|c| c.unwrap());
+        // typesafe macros :)
+        let text: &'static str = $text;
+        let mut text = text.bytes();
+        let value;
+        loop { match text.next() {
+            Some(b'{') => match text.next() {
+                Some(b'{') => assert_eq!(Some(b'{'), stdin.next()),
+                Some(b'}') => {
+                    let s: Vec<u8> = match text.next() {
+                        Some(c) => stdin.take_while(|&ch| ch != c).collect(),
+                        None => stdin.take_while(|ch| !b"\t\r\n ".contains(ch)).collect(),
+                    };
+                    let s = std::str::from_utf8(&s).unwrap();
+                    value = FromStr::from_str(s).unwrap();
+                    break;
+                }
+                Some(_) => panic!("found bad curly brace"),
+                None => panic!("found single open curly brace at the end of the format string"),
+            },
+            Some(c) => assert_eq!(Some(c), stdin.next()),
+            None => panic!("Bad read! format string: did not contain {{}}"),
+        } }
+        value
     }};
 );
-
-/// This function is a hack until macros can reference private items
-#[doc(hidden)]
-pub fn read_until<I: Iterator<Item=std::io::Result<u8>>>(next: &[u8], it: &mut I) -> Vec<u8> {
-    it.by_ref()
-      .map(|c| c.unwrap())
-      .take_while(|c| !next.contains(c))
-      .collect::<Vec<u8>>()
-}
-
-/// This function is a hack until macros can reference private items
-#[doc(hidden)]
-pub fn is_char<I: Iterator<Item=std::io::Result<u8>>>(c: u8, it: &mut I) {
-    assert_eq!(c, it.next().unwrap().unwrap());
-}
