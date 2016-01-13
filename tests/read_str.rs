@@ -1,11 +1,15 @@
-#![cfg_attr(feature="nightly", feature(plugin))]
-#![cfg_attr(feature="nightly", plugin(text_io))]
-#[cfg(not(feature="nightly"))] #[macro_use] extern crate text_io;
+#[macro_use] extern crate text_io;
 
 #[test]
 fn simple() {
     let val: i32 = read!("{}", "42".bytes());
     assert_eq!(val, 42);
+}
+
+#[test]
+fn simple_spaces() {
+    let val: String = read!("{}  64", "42  64".bytes());
+    assert_eq!(val, "42");
 }
 
 #[test]

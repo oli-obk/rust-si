@@ -1,11 +1,1 @@
 language: rust
-matrix:
-  include:
-    - rust: nightly
-      env: FEATURES=nightly
-    - rust: beta
-      env: FEATURES=''
-    - rust: stable
-      env: FEATURES=''
-script:
-   - cargo test --verbose --features "$FEATURES"

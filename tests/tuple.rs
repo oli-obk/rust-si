@@ -19,24 +19,6 @@ fn test_str(exe: &str, s: &str) {
 }
 
 #[test]
-#[cfg(feature="nightly")]
-fn run() {
-    test_str("target/debug/test_tuple", "42, 99, Ä");
-}
-
-#[test]
-#[should_panic]
-fn no_ws_replacement() {
-    test_str("target/debug/test_tuple", "42,\t99,\nÄ");
-}
-
-#[test]
-#[should_panic]
-fn run_fail() {
-    test_str("target/debug/test_tuple", "42,99, Ä");
-}
-
-#[test]
 fn run_read() {
     test_str("target/debug/examples/test_read", "the answer™: 42");
 }
