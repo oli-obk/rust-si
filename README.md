@@ -7,22 +7,6 @@ Don't forget to add the plugin to your crate:
 #[macro_use] extern crate text_io;
 ```
 
-If you are on nightly and wish to parse multiple values
-in one `read` invocation, you need to replace the import with
-
-```rust
-#![feature(plugin)]
-#![plugin(text_io)]
-```
-
-and enable the cargo feature `nightly`
-
-```toml
-[dependencies.text_io]
-version = "*"
-features = ["nightly"]
-```
-
 #Examples
 
 ```rust
@@ -39,11 +23,4 @@ let line: String = read!("{}\n");
 // read until the next "<" and return that.
 // expect the input "/i></b>"
 let stuff: String = read!("<b><i>{}</i></b>");
-
-// note, reading multiple values isn't possible in beta
-// read until a comma, parse what you read to an i32
-// skip the comma (read and forget)
-// skip the blank (read and forget)
-// read until any whitespace
-let tup: (i32, String) = read!("{}, {}");
 ```
