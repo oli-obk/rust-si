@@ -1,5 +1,6 @@
 [![Build Status](https://travis-ci.org/oli-obk/rust-si.svg?branch=master)](https://travis-ci.org/oli-obk/rust-si)
 [![Latest Version](https://img.shields.io/crates/v/text_io.svg)](https://crates.io/crates/text_io)
+[![Clippy Linting Result](http://clippy.bashy.io/github/oli-obk/rust-si/master/badge.svg)](http://clippy.bashy.io/github/oli-obk/rust-si/master/log)
 
 Don't forget to add the plugin to your crate:
 
