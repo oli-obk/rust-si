@@ -33,7 +33,7 @@ macro_rules! read(
     ($text:expr) => { read!($text, std::io::stdin().bytes().map(|c| c.unwrap())) };
     ($text:expr, $input:expr) => {{
         use std::io::Read;
-        use std::str::{FromStr, from_utf8};
+        use std::str::FromStr;
         // typesafe macros :)
         let text: &'static str = $text;
         let stdin: &mut Iterator<Item = u8> = &mut ($input);
