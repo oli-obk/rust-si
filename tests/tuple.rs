@@ -27,3 +27,13 @@ fn run_read() {
 fn run_read_simple() {
     test_str("target/debug/examples/test_read_simple", "99\n");
 }
+
+#[test]
+fn run_scan_simple() {
+    test_str("target/debug/examples/test_scan_simple", "42");
+}
+
+#[test]
+fn run_scan() {
+    test_str("target/debug/examples/test_scan", "99, 42\n66");
+}
