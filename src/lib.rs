@@ -45,8 +45,8 @@ macro_rules! read(
 /// This macro allows to pass several variables so multiple values can be read
 #[macro_export]
 macro_rules! scan(
-    ($text:expr, $($arg:ident),*) => { scan!(std::io::stdin().bytes().map(|c| c.unwrap()) => $text, $($arg),*) };
-    ($input:expr => $text:expr, $($arg:ident),*) => {{
+    ($text:expr, $($arg:expr),*) => { scan!(std::io::stdin().bytes().map(|c| c.unwrap()) => $text, $($arg),*) };
+    ($input:expr => $text:expr, $($arg:expr),*) => {{
         use std::io::Read;
         use std::str::FromStr;
         // typesafe macros :)
