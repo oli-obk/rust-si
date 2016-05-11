@@ -45,10 +45,10 @@ macro_rules! read(
 /// This macro allows to pass several variables so multiple values can be read
 #[macro_export]
 macro_rules! scan(
-    ($text:expr, $($arg:expr),*) => { scan!(std::io::stdin().bytes().map(|c| c.unwrap()) => $text, $($arg),*) };
+    ($text:expr, $($arg:expr),*) => { scan!(::std::io::stdin().bytes().map(|c| c.unwrap()) => $text, $($arg),*) };
     ($input:expr => $text:expr, $($arg:expr),*) => {{
-        use std::io::Read;
-        use std::str::FromStr;
+        use ::std::io::Read;
+        use ::std::str::FromStr;
         // typesafe macros :)
         let text: &'static str = $text;
         let stdin: &mut Iterator<Item = u8> = &mut ($input);
@@ -63,7 +63,7 @@ macro_rules! scan(
                         Some(c) => stdin.take_while(|&ch| ch != c).collect(),
                         None => stdin.take_while(|ch| !b"\t\r\n ".contains(ch)).collect(),
                     };
-                    let s = match std::str::from_utf8(&s) {
+                    let s = match ::std::str::from_utf8(&s) {
                         Ok(s) => s,
                         Err(e) => {
                             let n = e.valid_up_to();
@@ -71,7 +71,7 @@ macro_rules! scan(
                                 panic!("input was not valid utf8: {:?}", s);
                             } else {
                                 panic!("input was only partially valid utf8: \"{}\" followed by {:?}",
-                                       std::str::from_utf8(&s[..n]).unwrap(), &s[n..]);
+                                       ::std::str::from_utf8(&s[..n]).unwrap(), &s[n..]);
                             }
                         }
                     };
