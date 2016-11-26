@@ -1,6 +1,5 @@
 
 #[macro_use] extern crate text_io;
-//#[cfg(feature= "withcompiletest")]
 pub fn main() {
     let a: i32;
     let b: &mut u8 = &mut 5;
