@@ -37,3 +37,9 @@ fn run_scan_simple() {
 fn run_scan() {
     test_str("target/debug/examples/test_scan", "99, 42\n66");
 }
+
+#[test]
+#[should_panic]
+fn run_unsupported_formatting_trait(){
+    test_str("target/debug/failing-examples/test_unsupported_fomatting_trait","the answer™: 42");
+}

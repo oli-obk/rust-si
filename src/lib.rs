@@ -45,7 +45,10 @@ macro_rules! read(
 /// This macro allows to pass several variables so multiple values can be read
 #[macro_export]
 macro_rules! scan(
-    ($text:expr, $($arg:expr),*) => { scan!(::std::io::stdin().bytes().map(|c| c.unwrap()) => $text, $($arg),*) };
+    ($text:expr, $($arg:expr),*) => {
+        scan!(::std::io::stdin().bytes().map(|c| c.unwrap()) => $text, $($arg),*) ;
+        format_args!($text, $($arg),*);
+    };
     ($input:expr => $text:expr, $($arg:expr),*) => {{
         use ::std::io::Read;
         use ::std::str::FromStr;
@@ -88,5 +91,6 @@ macro_rules! scan(
         for c in text {
             assert_eq!(Some(c), stdin.next());
         }
+        format_args!($text, $($arg),*);
     }};
 );
