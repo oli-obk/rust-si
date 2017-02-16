@@ -42,4 +42,11 @@ fn scan() {
     let i: i32;
     scan!("<b>12</b>".bytes() => "<b>{}</b>", i);
     assert_eq!(i, 12);
+
+    let mut stdin = "1  2".bytes();
+    let (i, j): (i32, i32);
+    scan!(stdin => "{}", i);
+    scan!(stdin => "{}", j);
+    assert_eq!(1, i);
+    assert_eq!(2, j);
 }
