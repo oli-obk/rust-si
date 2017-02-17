@@ -62,9 +62,13 @@ macro_rules! scan(
             Some(b'{') => match text.next() {
                 Some(b'{') => assert_eq!(Some(b'{'), stdin.next()),
                 Some(b'}') => {
+                    static WHITESPACES: &'static [u8] = b"\t\r\n ";
                     let s: Vec<u8> = match text.next() {
                         Some(c) => stdin.take_while(|&ch| ch != c).collect(),
-                        None => stdin.take_while(|ch| !b"\t\r\n ".contains(ch)).collect(),
+                        None => stdin
+                            .skip_while(|ch| WHITESPACES.contains(ch))
+                            .take_while(|ch| !WHITESPACES.contains(ch))
+                            .collect(),
                     };
                     let s = match ::std::str::from_utf8(&s) {
                         Ok(s) => s,
