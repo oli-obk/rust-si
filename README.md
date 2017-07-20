@@ -15,9 +15,9 @@ implements `Iterator<Item=u8>` as an optional third argument, and the `scan!`
 macro's arguments can be prefixed with `iter => ` where `iter` implements
 `Iterator<Item=u8>`.
 
-#Examples
+# Examples
 
-##scan! macro
+## scan! macro
 
 ```rust
 // reading from a string source
@@ -31,7 +31,7 @@ let b: &mut u8 = &mut 5;
 scan!("{}, {}", a, *b);
 ```
 
-##read! macro
+## read! macro
 
 ```rust
 // read until a whitespace and try to convert what was read into an i32
