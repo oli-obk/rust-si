@@ -24,6 +24,16 @@ fn run_read() {
 }
 
 #[test]
+fn run_try_read() {
+    test_str("target/debug/examples/test_try_read", "the answer™: 42");
+}
+
+#[test]
+fn run_try_scan() {
+    test_str("target/debug/examples/test_try_scan", "99, 42\n66");
+}
+
+#[test]
 fn run_read_simple() {
     test_str("target/debug/examples/test_read_simple", "99\n");
 }
