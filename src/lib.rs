@@ -32,6 +32,7 @@
 
 use std::error;
 use std::fmt;
+use std::str::FromStr;
 
 #[derive(Debug, PartialEq)]
 pub enum Error {
@@ -82,6 +83,42 @@ impl fmt::Display for Error {
                 &raw[n..]
             ),
             _ => write!(f, "{}", <Error as error::Error>::description(self)),
+        }
+    }
+}
+
+pub fn match_next(expected: u8, iter: &mut Iterator<Item = u8>) -> Result<(), Error> {
+    let next = iter.next();
+    if next != Some(expected) {
+        return Err(Error::UnexpectedValue(expected, next))?
+    }
+    Ok(())
+}
+
+pub fn parse_capture<T>(name: &'static str, next: Option<u8>, iter: &mut Iterator<Item = u8>)
+-> Result<T, Error>
+where
+    T: FromStr,
+    <T as FromStr>::Err: ::std::fmt::Debug
+{
+    static WHITESPACES: &'static [u8] = b"\t\r\n ";
+    let raw: Vec<u8> = match next {
+        Some(c) => iter.take_while(|&ch| ch != c).collect(),
+        None => iter
+            .skip_while(|ch| WHITESPACES.contains(ch))
+            .take_while(|ch| !WHITESPACES.contains(ch))
+            .collect(),
+    };
+    match String::from_utf8(raw) {
+        Ok(s) => FromStr::from_str(&s).map_err(|_| Error::Parse(s, name)),
+        Err(e) => {
+            let n = e.utf8_error().valid_up_to();
+            let raw = e.into_bytes();
+            if n == 0 {
+                Err(Error::InvalidUtf8(raw))
+            } else {
+                Err(Error::PartialUtf8(n, raw))
+            }
         }
     }
 }
@@ -149,44 +186,7 @@ macro_rules! try_scan(
         format_args!($pattern, $($arg),*);
     };
     ($input:expr => $pattern:expr, $($arg:expr),*) => {{
-        use ::std::str::FromStr;
-        use $crate::Error;
-
-        fn match_next(expected: u8, iter: &mut Iterator<Item = u8>) -> Result<(), $crate::Error> {
-            let next = iter.next();
-            if next != Some(expected) {
-                return Err(Error::UnexpectedValue(expected, next))?
-            }
-            Ok(())
-        }
-
-        fn parse_capture<T>(name: &'static str, next: Option<u8>, iter: &mut Iterator<Item = u8>)
-        -> Result<T, $crate::Error>
-        where
-            T: FromStr,
-            <T as FromStr>::Err: ::std::fmt::Debug
-        {
-            static WHITESPACES: &'static [u8] = b"\t\r\n ";
-            let raw: Vec<u8> = match next {
-                Some(c) => iter.take_while(|&ch| ch != c).collect(),
-                None => iter
-                    .skip_while(|ch| WHITESPACES.contains(ch))
-                    .take_while(|ch| !WHITESPACES.contains(ch))
-                    .collect(),
-            };
-            match String::from_utf8(raw) {
-                Ok(s) => FromStr::from_str(&s).map_err(|_| Error::Parse(s, name)),
-                Err(e) => {
-                    let n = e.utf8_error().valid_up_to();
-                    let raw = e.into_bytes();
-                    if n == 0 {
-                        Err(Error::InvalidUtf8(raw))
-                    } else {
-                        Err(Error::PartialUtf8(n, raw))
-                    }
-                }
-            }
-        }
+        use $crate::{Error, match_next, parse_capture};
 
         // typesafe macros :)
         let pattern: &'static str = $pattern;
