@@ -1,7 +1,7 @@
 //! This crate allows one-liners to read from a terminal
 //! A minimal example to get an i32 from the command line is
 //!
-//! ```rust,ignore
+//! ```rust,no_run
 //! #[macro_use] extern crate text_io;
 //! fn main() {
 //!     let i: i32 = read!();
@@ -17,8 +17,12 @@
 //! Text parsing can be done similar to `println!` by adding a format string
 //! to the macro:
 //!
-//! ```rust,ignore
+//! ```rust,no_run
+//! # #[macro_use]
+//! # extern crate text_io;
+//! # fn main() {
 //! let i: i32 = read!("The answer: {}!");
+//! # }
 //! ```
 //!
 //! This will read `"The answer: "`, then an integer, then an exclamation mark. Any deviation from
@@ -46,11 +50,11 @@ macro_rules! read(
 #[macro_export]
 macro_rules! scan(
     ($text:expr, $($arg:expr),*) => {
+        use ::std::io::Read;
         scan!(::std::io::stdin().bytes().map(|c| c.unwrap()) => $text, $($arg),*) ;
         format_args!($text, $($arg),*);
     };
     ($input:expr => $text:expr, $($arg:expr),*) => {{
-        use ::std::io::Read;
         use ::std::str::FromStr;
         // typesafe macros :)
         let text: &'static str = $text;
