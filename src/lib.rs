@@ -186,6 +186,15 @@ macro_rules! try_scan(
         format_args!($pattern, $($arg),*);
     };
     ($input:expr => $pattern:expr, $($arg:expr),*) => {{
+        try_scan!(@impl question_mark; $input => $pattern, $($arg),*)
+    }};
+    (@question_mark: $($e:tt)+) => {{
+        ($($e)+)?
+    }};
+    (@unwrap: $($e:tt)+) => {{
+        ($($e)+).unwrap()
+    }};
+    (@impl $action:tt; $input:expr => $pattern:expr, $($arg:expr),*) => {{
         use $crate::{Error, match_next, parse_capture};
 
         // typesafe macros :)
@@ -196,19 +205,19 @@ macro_rules! try_scan(
 
         $(
             $arg = loop {
-                match pattern.next().ok_or(Error::MissingMatch)? {
-                    b'{' => match pattern.next().ok_or(Error::MissingClosingBrace)? {
-                        b'{' => match_next(b'{', stdin)?,
-                        b'}' => break parse_capture(stringify!($arg), pattern.next(), stdin)?,
-                        _ => return Err(Error::MissingClosingBrace)?,
+                match try_scan!(@$action: pattern.next().ok_or(Error::MissingMatch)) {
+                    b'{' => match try_scan!(@$action: pattern.next().ok_or(Error::MissingClosingBrace)) {
+                        b'{' => try_scan!(@$action: match_next(b'{', stdin)),
+                        b'}' => break try_scan!(@$action: parse_capture(stringify!($arg), pattern.next(), stdin)),
+                        _ => return try_scan!(@$action: Err(Error::MissingClosingBrace)),
                     },
-                    c => match_next(c, stdin)?,
+                    c => try_scan!(@$action: match_next(c, stdin)),
                 }
             };
         )*
 
         for c in pattern {
-            match_next(c, stdin)?
+            try_scan!(@$action: match_next(c, stdin))
         }
 
         format_args!($pattern, $($arg),*);
@@ -218,17 +227,9 @@ macro_rules! try_scan(
 /// All text input is handled through this macro
 #[macro_export]
 macro_rules! read(
-    () => { read!("{}") };
-    ($text:expr) => {{
-        let value;
-        scan!($text, value);
-        value
-    }};
-    ($text:expr, $input:expr) => {{
-        let value;
-        scan!($input => $text, value);
-        value
-    }};
+    ($($arg:tt)*) => {
+        try_read!($($arg)*).unwrap()
+    };
 );
 
 /// This macro allows to pass several variables so multiple values can be read
@@ -239,51 +240,7 @@ macro_rules! scan(
         scan!(::std::io::stdin().bytes().map(|c| c.unwrap()) => $text, $($arg),*) ;
         format_args!($text, $($arg),*);
     };
-    ($input:expr => $text:expr, $($arg:expr),*) => {{
-        use ::std::str::FromStr;
-        // typesafe macros :)
-        let text: &'static str = $text;
-        let stdin: &mut Iterator<Item = u8> = &mut ($input);
-
-        let mut text = text.bytes();
-        $(
-        loop { match text.next() {
-            Some(b'{') => match text.next() {
-                Some(b'{') => assert_eq!(Some(b'{'), stdin.next()),
-                Some(b'}') => {
-                    static WHITESPACES: &'static [u8] = b"\t\r\n ";
-                    let s: Vec<u8> = match text.next() {
-                        Some(c) => stdin.take_while(|&ch| ch != c).collect(),
-                        None => stdin
-                            .skip_while(|ch| WHITESPACES.contains(ch))
-                            .take_while(|ch| !WHITESPACES.contains(ch))
-                            .collect(),
-                    };
-                    let s = match ::std::str::from_utf8(&s) {
-                        Ok(s) => s,
-                        Err(e) => {
-                            let n = e.valid_up_to();
-                            if n == 0 {
-                                panic!("input was not valid utf8: {:?}", s);
-                            } else {
-                                panic!("input was only partially valid utf8: \"{}\" followed by {:?}",
-                                       ::std::str::from_utf8(&s[..n]).unwrap(), &s[n..]);
-                            }
-                        }
-                    };
-                    $arg = FromStr::from_str(s).expect(&format!("could not parse {} as target type of {}", s, stringify!($arg)));
-                    break;
-                }
-                Some(_) => panic!("found bad curly brace"),
-                None => panic!("found single open curly brace at the end of the format string"),
-            },
-            Some(c) => assert_eq!(Some(c), stdin.next()),
-            None => panic!("Bad read! format string: did not contain {{}}"),
-        } }
-        )*
-        for c in text {
-            assert_eq!(Some(c), stdin.next());
-        }
-        format_args!($text, $($arg),*);
+    ($input:expr => $pattern:expr, $($arg:expr),*) => {{
+        try_scan!(@impl unwrap; $input => $pattern, $($arg),*)
     }};
 );
