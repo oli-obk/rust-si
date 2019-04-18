@@ -1,4 +1,5 @@
-#[macro_use] extern crate text_io;
+#[macro_use]
+extern crate text_io;
 
 pub fn main() {
     let (a, b, c): (i32, i32, i32);

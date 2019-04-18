@@ -1,4 +1,5 @@
-#[macro_use] extern crate text_io;
+#[macro_use]
+extern crate text_io;
 
 #[test]
 fn simple() {
@@ -15,7 +16,10 @@ fn simple_spaces() {
 #[test]
 fn file() {
     use std::io::Read;
-    let mut file = std::fs::File::open("tests/answer.txt").unwrap().bytes().map(|ch| ch.unwrap());
+    let mut file = std::fs::File::open("tests/answer.txt")
+        .unwrap()
+        .bytes()
+        .map(|ch| ch.unwrap());
     let val: i32 = read!("The answer is {}!!!11einself\n", file);
     assert_eq!(val, 42);
     let s: String = read!("There is {} spoon", file);
@@ -25,7 +29,10 @@ fn file() {
 #[test]
 fn file_scan() {
     use std::io::Read;
-    let mut file = std::fs::File::open("tests/answer.txt").unwrap().bytes().map(|ch| ch.unwrap());
+    let mut file = std::fs::File::open("tests/answer.txt")
+        .unwrap()
+        .bytes()
+        .map(|ch| ch.unwrap());
     let val: i32;
     let s = &mut String::new();
     scan!(file => "The answer is {}!!!11einself\nThere is {} spoon", val, *s);

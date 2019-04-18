@@ -1,4 +1,5 @@
-#[macro_use] extern crate text_io;
+#[macro_use]
+extern crate text_io;
 
 mod bla {
     pub fn parse(text: String) -> (i32, i32) {
