@@ -182,7 +182,7 @@ macro_rules! try_read(
 macro_rules! try_scan(
     ($pattern:expr, $($arg:expr),*) => {
         use ::std::io::Read;
-        try_scan!(::std::io::stdin().bytes().map(|c| c.unwrap()) => $pattern, $($arg),*) ;
+        try_scan!(::std::io::stdin().bytes().map(std::result::Result::unwrap) => $pattern, $($arg),*);
         format_args!($pattern, $($arg),*);
     };
     ($input:expr => $pattern:expr, $($arg:expr),*) => {{
@@ -237,7 +237,7 @@ macro_rules! read(
 macro_rules! scan(
     ($text:expr, $($arg:expr),*) => {
         use ::std::io::Read;
-        scan!(::std::io::stdin().bytes().map(|c| c.unwrap()) => $text, $($arg),*) ;
+        scan!(::std::io::stdin().bytes().map(std::result::Result::unwrap) => $text, $($arg),*);
         format_args!($text, $($arg),*);
     };
     ($input:expr => $pattern:expr, $($arg:expr),*) => {{
