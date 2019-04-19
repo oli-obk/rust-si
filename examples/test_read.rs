@@ -1,4 +1,5 @@
-#[macro_use] extern crate text_io;
+#[macro_use]
+extern crate text_io;
 
 pub fn main() {
     let val: i32 = read!("the answer™: {}");

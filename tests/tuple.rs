@@ -1,6 +1,6 @@
 fn test_str(exe: &str, s: &str) {
-    use std::process::{Command, Stdio};
     use std::io::Write;
+    use std::process::{Command, Stdio};
     use std::str::from_utf8;
     let mut cmd = Command::new(exe)
         .stdin(Stdio::piped())
@@ -50,6 +50,9 @@ fn run_scan() {
 
 #[test]
 #[should_panic]
-fn run_unsupported_formatting_trait(){
-    test_str("target/debug/failing-examples/test_unsupported_fomatting_trait","the answer™: 42");
+fn run_unsupported_formatting_trait() {
+    test_str(
+        "target/debug/failing-examples/test_unsupported_fomatting_trait",
+        "the answer™: 42",
+    );
 }

@@ -1,4 +1,5 @@
-#[macro_use] extern crate text_io;
+#[macro_use]
+extern crate text_io;
 
 pub fn main() {
     use std::error::Error;
@@ -27,7 +28,10 @@ pub fn main() {
 
     let val = parse_closure("the answer™: abc");
     // Failed to parse 'abc' into variable '__try_read_var__' (defined in the try_read macro)
-    assert_eq!(val, Err(text_io::Error::Parse("abc".into(), "__try_read_var__")));
+    assert_eq!(
+        val,
+        Err(text_io::Error::Parse("abc".into(), "__try_read_var__"))
+    );
 
     let val = parse_closure("the answer™: 42");
     assert_eq!(val, Ok(42));
