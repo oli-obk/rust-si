@@ -2,7 +2,8 @@
 //! A minimal example to get an i32 from the command line is
 //!
 //! ```rust,no_run
-//! #[macro_use] extern crate text_io;
+//! use text_io::read;
+//!
 //! fn main() {
 //!     let i: i32 = read!();
 //! }
@@ -18,11 +19,9 @@
 //! to the macro:
 //!
 //! ```rust,no_run
-//! # #[macro_use]
-//! # extern crate text_io;
-//! # fn main() {
+//! use text_io::read;
+//!
 //! let i: i32 = read!("The answer: {}!");
-//! # }
 //! ```
 //!
 //! This will read `"The answer: "`, then an integer, then an exclamation mark. Any deviation from
@@ -127,25 +126,21 @@ where
 }
 
 /// ```rust,no_run
-/// # #[macro_use]
-/// # extern crate text_io;
-/// # fn main() {
+/// use text_io::try_read;
+///
 /// let i: i32 = try_read!("The answer: {}!").unwrap();
 /// let i: Result<i32, _> = try_read!("The {}{{}}!", "The answer is 42!".bytes());
 /// assert!(i.is_err());
-/// # }
 /// ```
 ///
 /// ```rust
-/// # #[macro_use]
-/// # extern crate text_io;
-/// # fn main() {
+/// use text_io::try_read;
+///
 /// let i: Result<i32, _> = try_read!("The answer is {}!", "The answer is 42!".bytes());
 /// assert!(i.is_ok());
 ///
 /// let i: Result<i32, _> = try_read!("The {}{{}}!", "The answer is 42!".bytes());
 /// assert!(i.is_err());
-/// # }
 /// ```
 #[macro_export]
 macro_rules! try_read(
@@ -167,11 +162,9 @@ macro_rules! try_read(
 );
 
 /// ```rust,no_run
-/// # #[macro_use]
-/// # extern crate text_io;
-/// # use std::error::Error;
-/// # fn main() {}
-/// fn parser() -> Result<i32, Box<Error>> {
+/// use text_io::try_scan;
+///
+/// fn parser() -> Result<i32, Box<std::error::Error>> {
 ///     let i: i32;
 ///     let text = "The answer is 42!";
 ///

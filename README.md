@@ -2,12 +2,6 @@
 [![Latest Version](https://img.shields.io/crates/v/text_io.svg)](https://crates.io/crates/text_io)
 [![Clippy Linting Result](http://clippy.bashy.io/github/oli-obk/rust-si/master/badge.svg)](http://clippy.bashy.io/github/oli-obk/rust-si/master/log)
 
-Don't forget to add the plugin to your crate:
-
-```rust
-#[macro_use] extern crate text_io;
-```
-
 You can use either the `read!` macro to read a single value and return it, or
 the `scan!` macro to read one or more values into variables. Both macros can
 also read from a file or from memory. The `read!` macro can take any type that
@@ -20,6 +14,8 @@ macro's arguments can be prefixed with `iter => ` where `iter` implements
 ## scan! macro
 
 ```rust
+use text_io::scan;
+
 // reading from a string source
 let i: i32;
 scan!("<b>12</b>".bytes() => "<b>{}</b>", i);
@@ -34,6 +30,8 @@ scan!("{}, {}", a, *b);
 ## read! macro
 
 ```rust
+use text_io::read;
+
 // read until a whitespace and try to convert what was read into an i32
 let i: i32 = read!();
 
