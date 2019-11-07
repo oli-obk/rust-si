@@ -149,18 +149,18 @@ where
 /// ```
 #[macro_export]
 macro_rules! try_read(
-    () => { try_read!("{}") };
+    () => { $crate::try_read!("{}") };
     ($text:expr) => {{
         (|| -> Result<_, $crate::Error> {
             let __try_read_var__;
-            try_scan!($text, __try_read_var__);
+            $crate::try_scan!($text, __try_read_var__);
             Ok(__try_read_var__)
         })()
     }};
     ($text:expr, $input:expr) => {{
         (|| -> Result<_, $crate::Error> {
             let __try_read_var__;
-            try_scan!($input => $text, __try_read_var__);
+            $crate::try_scan!($input => $text, __try_read_var__);
             Ok(__try_read_var__)
         })()
     }};
@@ -185,11 +185,11 @@ macro_rules! try_read(
 macro_rules! try_scan(
     ($pattern:expr, $($arg:expr),*) => {
         use ::std::io::Read;
-        try_scan!(::std::io::stdin().bytes().map(std::result::Result::unwrap) => $pattern, $($arg),*);
+        $crate::try_scan!(::std::io::stdin().bytes().map(std::result::Result::unwrap) => $pattern, $($arg),*);
         format_args!($pattern, $($arg),*);
     };
     ($input:expr => $pattern:expr, $($arg:expr),*) => {{
-        try_scan!(@impl question_mark; $input => $pattern, $($arg),*)
+        $crate::try_scan!(@impl question_mark; $input => $pattern, $($arg),*)
     }};
     (@question_mark: $($e:tt)+) => {{
         ($($e)+)?
@@ -208,19 +208,19 @@ macro_rules! try_scan(
 
         $(
             $arg = loop {
-                match try_scan!(@$action: pattern.next().ok_or(Error::MissingMatch)) {
-                    b'{' => match try_scan!(@$action: pattern.next().ok_or(Error::MissingClosingBrace)) {
-                        b'{' => try_scan!(@$action: match_next(b'{', stdin)),
-                        b'}' => break try_scan!(@$action: parse_capture(stringify!($arg), pattern.next(), stdin)),
-                        _ => return try_scan!(@$action: Err(Error::MissingClosingBrace)),
+                match $crate::try_scan!(@$action: pattern.next().ok_or(Error::MissingMatch)) {
+                    b'{' => match $crate::try_scan!(@$action: pattern.next().ok_or(Error::MissingClosingBrace)) {
+                        b'{' => $crate::try_scan!(@$action: match_next(b'{', stdin)),
+                        b'}' => break $crate::try_scan!(@$action: parse_capture(stringify!($arg), pattern.next(), stdin)),
+                        _ => return $crate::try_scan!(@$action: Err(Error::MissingClosingBrace)),
                     },
-                    c => try_scan!(@$action: match_next(c, stdin)),
+                    c => $crate::try_scan!(@$action: match_next(c, stdin)),
                 }
             };
         )*
 
         for c in pattern {
-            try_scan!(@$action: match_next(c, stdin))
+            $crate::try_scan!(@$action: match_next(c, stdin))
         }
 
         format_args!($pattern, $($arg),*);
@@ -231,7 +231,7 @@ macro_rules! try_scan(
 #[macro_export]
 macro_rules! read(
     ($($arg:tt)*) => {
-        try_read!($($arg)*).unwrap()
+        $crate::try_read!($($arg)*).unwrap()
     };
 );
 
@@ -240,10 +240,10 @@ macro_rules! read(
 macro_rules! scan(
     ($text:expr, $($arg:expr),*) => {
         use ::std::io::Read;
-        scan!(::std::io::stdin().bytes().map(std::result::Result::unwrap) => $text, $($arg),*);
+        $crate::scan!(::std::io::stdin().bytes().map(std::result::Result::unwrap) => $text, $($arg),*);
         format_args!($text, $($arg),*);
     };
     ($input:expr => $pattern:expr, $($arg:expr),*) => {{
-        try_scan!(@impl unwrap; $input => $pattern, $($arg),*)
+        $crate::try_scan!(@impl unwrap; $input => $pattern, $($arg),*)
     }};
 );
