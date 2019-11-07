@@ -48,7 +48,7 @@ pub enum Error {
 
 impl error::Error for Error {
     fn description(&self) -> &str {
-        use Error::*;
+        use crate::Error::*;
 
         match *self {
             MissingMatch => "Bad read! format string: did not contain {{}}",
@@ -64,8 +64,8 @@ impl error::Error for Error {
 
 impl fmt::Display for Error {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        use crate::Error::*;
         use std::str::from_utf8;
-        use Error::*;
 
         match *self {
             InvalidUtf8(ref raw) => write!(f, "input was not valid utf8: {:?}", raw),
@@ -87,7 +87,7 @@ impl fmt::Display for Error {
     }
 }
 
-pub fn match_next(expected: u8, iter: &mut Iterator<Item = u8>) -> Result<(), Error> {
+pub fn match_next(expected: u8, iter: &mut dyn Iterator<Item = u8>) -> Result<(), Error> {
     let next = iter.next();
     if next != Some(expected) {
         return Err(Error::UnexpectedValue(expected, next))?;
@@ -98,7 +98,7 @@ pub fn match_next(expected: u8, iter: &mut Iterator<Item = u8>) -> Result<(), Er
 pub fn parse_capture<T>(
     name: &'static str,
     next: Option<u8>,
-    iter: &mut Iterator<Item = u8>,
+    iter: &mut dyn Iterator<Item = u8>,
 ) -> Result<T, Error>
 where
     T: FromStr,
