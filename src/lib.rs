@@ -2,7 +2,8 @@
 //! A minimal example to get an i32 from the command line is
 //!
 //! ```rust,no_run
-//! #[macro_use] extern crate text_io;
+//! use text_io::read;
+//!
 //! fn main() {
 //!     let i: i32 = read!();
 //! }
@@ -18,11 +19,9 @@
 //! to the macro:
 //!
 //! ```rust,no_run
-//! # #[macro_use]
-//! # extern crate text_io;
-//! # fn main() {
+//! use text_io::read;
+//!
 //! let i: i32 = read!("The answer: {}!");
-//! # }
 //! ```
 //!
 //! This will read `"The answer: "`, then an integer, then an exclamation mark. Any deviation from
@@ -48,7 +47,7 @@ pub enum Error {
 
 impl error::Error for Error {
     fn description(&self) -> &str {
-        use Error::*;
+        use crate::Error::*;
 
         match *self {
             MissingMatch => "Bad read! format string: did not contain {{}}",
@@ -64,8 +63,8 @@ impl error::Error for Error {
 
 impl fmt::Display for Error {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        use crate::Error::*;
         use std::str::from_utf8;
-        use Error::*;
 
         match *self {
             InvalidUtf8(ref raw) => write!(f, "input was not valid utf8: {:?}", raw),
@@ -87,7 +86,7 @@ impl fmt::Display for Error {
     }
 }
 
-pub fn match_next(expected: u8, iter: &mut Iterator<Item = u8>) -> Result<(), Error> {
+pub fn match_next(expected: u8, iter: &mut dyn Iterator<Item = u8>) -> Result<(), Error> {
     let next = iter.next();
     if next != Some(expected) {
         return Err(Error::UnexpectedValue(expected, next))?;
@@ -98,7 +97,7 @@ pub fn match_next(expected: u8, iter: &mut Iterator<Item = u8>) -> Result<(), Er
 pub fn parse_capture<T>(
     name: &'static str,
     next: Option<u8>,
-    iter: &mut Iterator<Item = u8>,
+    iter: &mut dyn Iterator<Item = u8>,
 ) -> Result<T, Error>
 where
     T: FromStr,
@@ -127,51 +126,45 @@ where
 }
 
 /// ```rust,no_run
-/// # #[macro_use]
-/// # extern crate text_io;
-/// # fn main() {
+/// use text_io::try_read;
+///
 /// let i: i32 = try_read!("The answer: {}!").unwrap();
 /// let i: Result<i32, _> = try_read!("The {}{{}}!", "The answer is 42!".bytes());
 /// assert!(i.is_err());
-/// # }
 /// ```
 ///
 /// ```rust
-/// # #[macro_use]
-/// # extern crate text_io;
-/// # fn main() {
+/// use text_io::try_read;
+///
 /// let i: Result<i32, _> = try_read!("The answer is {}!", "The answer is 42!".bytes());
 /// assert!(i.is_ok());
 ///
 /// let i: Result<i32, _> = try_read!("The {}{{}}!", "The answer is 42!".bytes());
 /// assert!(i.is_err());
-/// # }
 /// ```
 #[macro_export]
 macro_rules! try_read(
-    () => { try_read!("{}") };
+    () => { $crate::try_read!("{}") };
     ($text:expr) => {{
         (|| -> Result<_, $crate::Error> {
             let __try_read_var__;
-            try_scan!($text, __try_read_var__);
+            $crate::try_scan!($text, __try_read_var__);
             Ok(__try_read_var__)
         })()
     }};
     ($text:expr, $input:expr) => {{
         (|| -> Result<_, $crate::Error> {
             let __try_read_var__;
-            try_scan!($input => $text, __try_read_var__);
+            $crate::try_scan!($input => $text, __try_read_var__);
             Ok(__try_read_var__)
         })()
     }};
 );
 
 /// ```rust,no_run
-/// # #[macro_use]
-/// # extern crate text_io;
-/// # use std::error::Error;
-/// # fn main() {}
-/// fn parser() -> Result<i32, Box<Error>> {
+/// use text_io::try_scan;
+///
+/// fn parser() -> Result<i32, Box<std::error::Error>> {
 ///     let i: i32;
 ///     let text = "The answer is 42!";
 ///
@@ -185,11 +178,11 @@ macro_rules! try_read(
 macro_rules! try_scan(
     ($pattern:expr, $($arg:expr),*) => {
         use ::std::io::Read;
-        try_scan!(::std::io::stdin().bytes().map(std::result::Result::unwrap) => $pattern, $($arg),*);
+        $crate::try_scan!(::std::io::stdin().bytes().map(std::result::Result::unwrap) => $pattern, $($arg),*);
         format_args!($pattern, $($arg),*);
     };
     ($input:expr => $pattern:expr, $($arg:expr),*) => {{
-        try_scan!(@impl question_mark; $input => $pattern, $($arg),*)
+        $crate::try_scan!(@impl question_mark; $input => $pattern, $($arg),*)
     }};
     (@question_mark: $($e:tt)+) => {{
         ($($e)+)?
@@ -208,19 +201,19 @@ macro_rules! try_scan(
 
         $(
             $arg = loop {
-                match try_scan!(@$action: pattern.next().ok_or(Error::MissingMatch)) {
-                    b'{' => match try_scan!(@$action: pattern.next().ok_or(Error::MissingClosingBrace)) {
-                        b'{' => try_scan!(@$action: match_next(b'{', stdin)),
-                        b'}' => break try_scan!(@$action: parse_capture(stringify!($arg), pattern.next(), stdin)),
-                        _ => return try_scan!(@$action: Err(Error::MissingClosingBrace)),
+                match $crate::try_scan!(@$action: pattern.next().ok_or(Error::MissingMatch)) {
+                    b'{' => match $crate::try_scan!(@$action: pattern.next().ok_or(Error::MissingClosingBrace)) {
+                        b'{' => $crate::try_scan!(@$action: match_next(b'{', stdin)),
+                        b'}' => break $crate::try_scan!(@$action: parse_capture(stringify!($arg), pattern.next(), stdin)),
+                        _ => return $crate::try_scan!(@$action: Err(Error::MissingClosingBrace)),
                     },
-                    c => try_scan!(@$action: match_next(c, stdin)),
+                    c => $crate::try_scan!(@$action: match_next(c, stdin)),
                 }
             };
         )*
 
         for c in pattern {
-            try_scan!(@$action: match_next(c, stdin))
+            $crate::try_scan!(@$action: match_next(c, stdin))
         }
 
         format_args!($pattern, $($arg),*);
@@ -231,7 +224,7 @@ macro_rules! try_scan(
 #[macro_export]
 macro_rules! read(
     ($($arg:tt)*) => {
-        try_read!($($arg)*).unwrap()
+        $crate::try_read!($($arg)*).unwrap()
     };
 );
 
@@ -240,10 +233,10 @@ macro_rules! read(
 macro_rules! scan(
     ($text:expr, $($arg:expr),*) => {
         use ::std::io::Read;
-        scan!(::std::io::stdin().bytes().map(std::result::Result::unwrap) => $text, $($arg),*);
+        $crate::scan!(::std::io::stdin().bytes().map(std::result::Result::unwrap) => $text, $($arg),*);
         format_args!($text, $($arg),*);
     };
     ($input:expr => $pattern:expr, $($arg:expr),*) => {{
-        try_scan!(@impl unwrap; $input => $pattern, $($arg),*)
+        $crate::try_scan!(@impl unwrap; $input => $pattern, $($arg),*)
     }};
 );

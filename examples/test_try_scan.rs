@@ -4,7 +4,7 @@ extern crate text_io;
 pub fn main() {
     use std::error::Error;
 
-    fn parse_box_error() -> Result<(i32, i32, i32), Box<Error>> {
+    fn parse_box_error() -> Result<(i32, i32, i32), Box<dyn Error>> {
         // Parsing from stdio
         let (a, b, c);
         try_scan!("{}, {}\n{}", a, b, c);
