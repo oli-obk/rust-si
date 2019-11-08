@@ -191,6 +191,7 @@ macro_rules! try_scan(
         ($($e)+).unwrap()
     }};
     (@impl $action:tt; $input:expr => $pattern:expr, $($arg:expr),*) => {{
+        #![allow(clippy::try_err)]
         use $crate::{Error, match_next, parse_capture};
 
         // typesafe macros :)
