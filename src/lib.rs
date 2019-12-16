@@ -146,14 +146,14 @@ where
 macro_rules! try_read(
     () => { $crate::try_read!("{}") };
     ($text:expr) => {{
-        (|| -> Result<_, $crate::Error> {
+        (|| -> std::result::Result<_, $crate::Error> {
             let __try_read_var__;
             $crate::try_scan!($text, __try_read_var__);
             Ok(__try_read_var__)
         })()
     }};
     ($text:expr, $input:expr) => {{
-        (|| -> Result<_, $crate::Error> {
+        (|| -> std::result::Result<_, $crate::Error> {
             let __try_read_var__;
             $crate::try_scan!($input => $text, __try_read_var__);
             Ok(__try_read_var__)
