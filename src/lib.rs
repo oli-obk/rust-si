@@ -68,7 +68,10 @@ impl fmt::Display for Error {
                 &raw[n..]
             ),
             MissingMatch => write!(f, "Bad read! format string: did not contain {{}}"),
-            MissingClosingBrace => write!(f, "found single open curly brace at the end of the format string"),
+            MissingClosingBrace => write!(
+                f,
+                "found single open curly brace at the end of the format string"
+            ),
             __NonExhaustive__ => unreachable!(),
         }
     }
