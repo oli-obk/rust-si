@@ -45,21 +45,7 @@ pub enum Error {
     __NonExhaustive__,
 }
 
-impl error::Error for Error {
-    fn description(&self) -> &str {
-        use crate::Error::*;
-
-        match *self {
-            MissingMatch => "Bad read! format string: did not contain {{}}",
-            MissingClosingBrace => "found single open curly brace at the end of the format string",
-            UnexpectedValue(..) => "found value not matching the pattern",
-            InvalidUtf8(..) => "input was not valid utf8",
-            PartialUtf8(..) => "input was only partially valid utf8",
-            Parse(..) => "could not parse input as target type",
-            __NonExhaustive__ => unreachable!(),
-        }
-    }
-}
+impl error::Error for Error {}
 
 impl fmt::Display for Error {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
@@ -81,7 +67,9 @@ impl fmt::Display for Error {
                 from_utf8(&raw[..n]).unwrap(),
                 &raw[n..]
             ),
-            _ => write!(f, "{}", <Error as error::Error>::description(self)),
+            MissingMatch => write!(f, "Bad read! format string: did not contain {{}}"),
+            MissingClosingBrace => write!(f, "found single open curly brace at the end of the format string"),
+            __NonExhaustive__ => unreachable!(),
         }
     }
 }
