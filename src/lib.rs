@@ -178,6 +178,9 @@ macro_rules! try_scan(
     (@question_mark: $($e:tt)+) => {{
         ($($e)+)?
     }};
+    (@or_none: $($e:tt)+) => {{
+        ($($e)+).ok()?
+    }};
     (@unwrap: $($e:tt)+) => {{
         ($($e)+).unwrap()
     }};
