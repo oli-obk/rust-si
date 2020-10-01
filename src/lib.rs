@@ -78,7 +78,7 @@ impl fmt::Display for Error {
 pub fn match_next(expected: u8, iter: &mut dyn Iterator<Item = u8>) -> Result<(), Error> {
     let next = iter.next();
     if next != Some(expected) {
-        return Err(Error::UnexpectedValue(expected, next))?;
+        return Err(Error::UnexpectedValue(expected, next));
     }
     Ok(())
 }
