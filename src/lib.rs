@@ -33,6 +33,7 @@ use std::error;
 use std::fmt;
 use std::str::FromStr;
 
+#[non_exhaustive]
 #[derive(Debug, PartialEq)]
 pub enum Error {
     MissingMatch,
@@ -41,8 +42,6 @@ pub enum Error {
     InvalidUtf8(Vec<u8>),
     PartialUtf8(usize, Vec<u8>),
     Parse(String, &'static str),
-    #[doc(hidden)]
-    __NonExhaustive__,
 }
 
 impl error::Error for Error {}
@@ -72,7 +71,6 @@ impl fmt::Display for Error {
                 f,
                 "found single open curly brace at the end of the format string"
             ),
-            __NonExhaustive__ => unreachable!(),
         }
     }
 }
