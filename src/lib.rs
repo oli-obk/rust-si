@@ -33,6 +33,7 @@ use std::error;
 use std::fmt;
 use std::str::FromStr;
 
+#[non_exhaustive]
 #[derive(Debug, PartialEq)]
 pub enum Error {
     MissingMatch,
@@ -41,8 +42,6 @@ pub enum Error {
     InvalidUtf8(Vec<u8>),
     PartialUtf8(usize, Vec<u8>),
     Parse(String, &'static str),
-    #[doc(hidden)]
-    __NonExhaustive__,
 }
 
 impl error::Error for Error {}
@@ -72,7 +71,6 @@ impl fmt::Display for Error {
                 f,
                 "found single open curly brace at the end of the format string"
             ),
-            __NonExhaustive__ => unreachable!(),
         }
     }
 }
@@ -80,7 +78,7 @@ impl fmt::Display for Error {
 pub fn match_next(expected: u8, iter: &mut dyn Iterator<Item = u8>) -> Result<(), Error> {
     let next = iter.next();
     if next != Some(expected) {
-        return Err(Error::UnexpectedValue(expected, next))?;
+        return Err(Error::UnexpectedValue(expected, next));
     }
     Ok(())
 }
@@ -94,7 +92,7 @@ where
     T: FromStr,
     <T as FromStr>::Err: ::std::fmt::Debug,
 {
-    static WHITESPACES: &'static [u8] = b"\t\r\n ";
+    static WHITESPACES: &[u8] = b"\t\r\n ";
     let raw: Vec<u8> = match next {
         Some(c) => iter.take_while(|&ch| ch != c).collect(),
         None => iter
