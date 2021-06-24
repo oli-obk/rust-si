@@ -1,6 +1,6 @@
 [![Build Status](https://travis-ci.org/oli-obk/rust-si.svg?branch=master)](https://travis-ci.org/oli-obk/rust-si)
 [![Latest Version](https://img.shields.io/crates/v/text_io.svg)](https://crates.io/crates/text_io)
-[![Clippy Linting Result](http://clippy.bashy.io/github/oli-obk/rust-si/master/badge.svg)](http://clippy.bashy.io/github/oli-obk/rust-si/master/log)
+
 
 You can use either the `read!` macro to read a single value and return it, or
 the `scan!` macro to read one or more values into variables. Both macros can
