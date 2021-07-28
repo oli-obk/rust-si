@@ -1,6 +1,6 @@
 fn test_str(exe: &str, s: &str) {
-    use std::io::Write;
     use std::process::{Command, Stdio};
+    use std::io::Write;
     use std::str::from_utf8;
     let mut cmd = Command::new(exe)
         .stdin(Stdio::piped())
@@ -24,16 +24,6 @@ fn run_read() {
 }
 
 #[test]
-fn run_try_read() {
-    test_str("target/debug/examples/test_try_read", "the answer™: 42");
-}
-
-#[test]
-fn run_try_scan() {
-    test_str("target/debug/examples/test_try_scan", "99, 42\n66");
-}
-
-#[test]
 fn run_read_simple() {
     test_str("target/debug/examples/test_read_simple", "99\n");
 }
@@ -46,13 +36,4 @@ fn run_scan_simple() {
 #[test]
 fn run_scan() {
     test_str("target/debug/examples/test_scan", "99, 42\n66");
-}
-
-#[test]
-#[should_panic]
-fn run_unsupported_formatting_trait() {
-    test_str(
-        "target/debug/failing-examples/test_unsupported_fomatting_trait",
-        "the answer™: 42",
-    );
 }
