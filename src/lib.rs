@@ -168,7 +168,6 @@ macro_rules! try_scan(
     ($pattern:expr, $($arg:expr),*) => {
         use ::std::io::Read;
         $crate::try_scan!(::std::io::stdin().bytes().map(std::result::Result::unwrap) => $pattern, $($arg),*);
-        format_args!($pattern, $($arg),*);
     };
     ($input:expr => $pattern:expr, $($arg:expr),*) => {{
         $crate::try_scan!(@impl question_mark; $input => $pattern, $($arg),*)
@@ -224,7 +223,6 @@ macro_rules! scan(
     ($text:expr, $($arg:expr),*) => {
         use ::std::io::Read;
         $crate::scan!(::std::io::stdin().bytes().map(std::result::Result::unwrap) => $text, $($arg),*);
-        format_args!($text, $($arg),*);
     };
     ($input:expr => $pattern:expr, $($arg:expr),*) => {{
         $crate::try_scan!(@impl unwrap; $input => $pattern, $($arg),*)
