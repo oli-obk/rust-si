@@ -25,3 +25,6 @@ grcov . --binary-path ./target/debug/ -s . -t html --branch --ignore-not-existin
 # Generate a LCOV report and upload it to codecov.io.
 grcov . --binary-path ./target/debug/ -s . -t lcov --branch --ignore-not-existing -o ./lcov.info
 bash <(curl -s https://codecov.io/bash) -f lcov.info
+
+tar -zcvf coverage.tar.gz ./coverage
+
