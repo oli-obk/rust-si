@@ -31,5 +31,5 @@ jobs:
         run: ./coverage.sh
       - uses: actions/upload-artifact@v2
         with:
-          name: coverage.tar.gz
-          path: coverage.tar.gz
+          name: coverage
+          path: ./coverage/

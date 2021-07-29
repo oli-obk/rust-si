@@ -1,6 +1,3 @@
-
-
-
 rustup default nightly
 cargo install grcov
 rustup component add llvm-tools-preview
@@ -11,7 +8,7 @@ rm -rf ./target *.prof*
 export RUSTFLAGS="-Zinstrument-coverage"
 
 # Ensure each test runs gets its own profile information by defining the LLVM_PROFILE_FILE environment variable (%p will be replaced by the process ID, and %m by the binary signature):
-export LLVM_PROFILE_FILE="your_name-%p-%m.profraw"
+export LLVM_PROFILE_FILE="text_io-%p-%m.profraw"
 
 # Build the program
 cargo build
@@ -26,5 +23,5 @@ grcov . --binary-path ./target/debug/ -s . -t html --branch --ignore-not-existin
 grcov . --binary-path ./target/debug/ -s . -t lcov --branch --ignore-not-existing -o ./lcov.info
 bash <(curl -s https://codecov.io/bash) -f lcov.info
 
-tar -zcvf coverage.tar.gz ./coverage
+
 
