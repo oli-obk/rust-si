@@ -8,7 +8,7 @@ homepage = "https://github.com/oli-obk/rust-si"
 repository = "https://github.com/oli-obk/rust-si"
 readme = "README.md"
 keywords = ["io", "read", "readline", "scan", "scanf"]
-license-file = "LICENSE"
+license = "MIT OR Apache-2.0"
 
 [lib]
 name = "text_io"
