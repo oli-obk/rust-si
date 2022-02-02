@@ -221,8 +221,10 @@ macro_rules! read(
 #[macro_export]
 macro_rules! scan(
     ($text:expr, $($arg:expr),*) => {
-        use ::std::io::Read;
-        $crate::scan!(::std::io::stdin().bytes().map(std::result::Result::unwrap) => $text, $($arg),*);
+        {
+            use ::std::io::Read;
+            $crate::scan!(::std::io::stdin().bytes().map(std::result::Result::unwrap) => $text, $($arg),*);
+        }
     };
     ($input:expr => $pattern:expr, $($arg:expr),*) => {{
         $crate::try_scan!(@impl unwrap; $input => $pattern, $($arg),*)
