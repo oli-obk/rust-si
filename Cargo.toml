@@ -1,6 +1,6 @@
 [package]
 name = "text_io"
-version = "0.1.9"
+version = "0.1.10"
 authors = ["Oliver Schneider <rust-si1949781094849131978611@oli-obk.de>"]
 edition = "2018"
 description = "really simple to use panicking input functions"
