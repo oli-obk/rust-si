@@ -153,7 +153,7 @@ macro_rules! try_read(
 /// ```rust,no_run
 /// use text_io::try_scan;
 ///
-/// fn parser() -> Result<i32, Box<std::error::Error>> {
+/// fn parser() -> Result<i32, Box<dyn std::error::Error>> {
 ///     let i: i32;
 ///     let text = "The answer is 42!";
 ///
