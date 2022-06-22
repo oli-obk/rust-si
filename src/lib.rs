@@ -153,7 +153,7 @@ macro_rules! try_read(
 /// ```rust,no_run
 /// use text_io::try_scan;
 ///
-/// fn parser() -> Result<i32, Box<std::error::Error>> {
+/// fn parser() -> Result<i32, Box<dyn std::error::Error>> {
 ///     let i: i32;
 ///     let text = "The answer is 42!";
 ///
@@ -184,7 +184,7 @@ macro_rules! try_scan(
 
         // typesafe macros :)
         let pattern: &'static str = $pattern;
-        let stdin: &mut Iterator<Item = u8> = &mut ($input);
+        let stdin: &mut dyn Iterator<Item = u8> = &mut ($input);
 
         let mut pattern = pattern.bytes();
 

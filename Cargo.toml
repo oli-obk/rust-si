@@ -1,8 +1,8 @@
 [package]
 name = "text_io"
-version = "0.1.10"
+version = "0.1.11"
 authors = ["Oliver Schneider <rust-si1949781094849131978611@oli-obk.de>"]
-edition = "2018"
+edition = "2021"
 description = "really simple to use panicking input functions"
 homepage = "https://github.com/oli-obk/rust-si"
 repository = "https://github.com/oli-obk/rust-si"
