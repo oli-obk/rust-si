@@ -184,7 +184,7 @@ macro_rules! try_scan(
 
         // typesafe macros :)
         let pattern: &'static str = $pattern;
-        let stdin: &mut Iterator<Item = u8> = &mut ($input);
+        let stdin: &mut dyn Iterator<Item = u8> = &mut ($input);
 
         let mut pattern = pattern.bytes();
 
