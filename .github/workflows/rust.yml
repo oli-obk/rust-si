@@ -36,13 +36,3 @@ jobs:
           name: coverage
           path: ./coverage/
 
-  build_edition_2018:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v2
-      - name: Switch to edition 2018 (Hack)
-        run: sed -i 's/2021/2018/' Cargo.toml && head -8 Cargo.toml
-      - name: Build
-        run: cargo build --verbose
-      - name: Run tests
-        run: cargo test --verbose
