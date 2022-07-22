@@ -136,6 +136,8 @@ macro_rules! try_read(
     () => { $crate::try_read!("{}") };
     ($text:expr) => {{
         (|| -> std::result::Result<_, $crate::Error> {
+            use std::io::Write;
+            std::io::stdout().flush().unwrap();
             let __try_read_var__;
             $crate::try_scan!($text, __try_read_var__);
             Ok(__try_read_var__)
