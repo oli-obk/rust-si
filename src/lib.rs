@@ -4,9 +4,7 @@
 //! ```rust,no_run
 //! use text_io::read;
 //!
-//! fn main() {
-//!     let i: i32 = read!();
-//! }
+//! let i: i32 = read!();
 //! ```
 //!
 //! The `read!()` macro will always read until the next ascii whitespace character
