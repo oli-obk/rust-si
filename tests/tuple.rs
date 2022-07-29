@@ -1,6 +1,6 @@
 fn test_str(exe: &str, s: &str) {
-    use std::process::{Command, Stdio};
     use std::io::Write;
+    use std::process::{Command, Stdio};
     use std::str::from_utf8;
     let mut cmd = Command::new(exe)
         .stdin(Stdio::piped())
