@@ -1,4 +1,4 @@
-[![Build Status](https://github.com/oli-obk/rust-si/actions/workflows/rust.yml/badge.svg)
+![Build Status](https://github.com/oli-obk/rust-si/actions/workflows/rust.yml/badge.svg)
 [![Latest Version](https://img.shields.io/crates/v/text_io.svg)](https://crates.io/crates/text_io)
 
 
