@@ -152,6 +152,16 @@ macro_rules! try_read(
     }};
 );
 
+/// Parse text into variables. You may choose how errors are handled.
+/// 
+/// By default, errors are propagated to the caller using the `?` operator. But there are several
+/// different types of error handling supported:
+/// - prefix the macro parameters with `@impl unwrap` to unwrap errors with `.unwrap()`
+/// - prefix the macro parameters with `@impl or_none` to propagate errors with `.ok()?`
+/// - prefix the macro parameters with `@impl question_mark` to propagate errors with `?` (as
+///   mentioned, this is the default setting)
+/// 
+/// # Example
 /// ```rust,no_run
 /// use text_io::try_scan;
 ///
@@ -176,6 +186,9 @@ macro_rules! try_scan(
     }};
     (@question_mark: $($e:tt)+) => {{
         ($($e)+)?
+    }};
+    (@or_none: $($e:tt)+) => {{
+        ($($e)+).ok()?
     }};
     (@unwrap: $($e:tt)+) => {{
         ($($e)+).unwrap()

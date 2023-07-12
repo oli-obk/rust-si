@@ -56,4 +56,14 @@ fn scan() {
     scan!(stdin => "{}", j);
     assert_eq!(1, i);
     assert_eq!(2, j);
+
+    // Returns the scanned value multiplied by two, or None if the provided
+    // text doesn't match the pattern
+    fn scan_and_double(text: &str) -> Option<i32> {
+        let value: i32;
+        try_scan!(@impl or_none; text.bytes() => "<b>{}</b>", value);
+        Some(value * 2)
+    }
+    assert_eq!(scan_and_double("<b>7</b>"), Some(14));
+    assert_eq!(scan_and_double("<c>7</c>"), None);
 }
