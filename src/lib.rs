@@ -206,8 +206,6 @@ macro_rules! try_scan(
         for c in pattern {
             $crate::try_scan!(@$action: match_next(c, stdin))
         }
-
-        format_args!($pattern, $($arg),*);
     }};
 );
 
