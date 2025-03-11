@@ -174,9 +174,11 @@ macro_rules! try_scan(
     ($input:expr => $pattern:expr, $($arg:expr),*) => {{
         $crate::try_scan!(@impl question_mark; $input => $pattern, $($arg),*)
     }};
+    // implementation detail.
     (@question_mark: $($e:tt)+) => {{
         ($($e)+)?
     }};
+    // implementation detail.
     (@unwrap: $($e:tt)+) => {{
         ($($e)+).unwrap()
     }};
@@ -207,7 +209,7 @@ macro_rules! try_scan(
             $crate::try_scan!(@$action: match_next(c, stdin))
         }
 
-        format_args!($pattern, $($arg),*);
+        format_args!($pattern, $({let _ = &$arg; ""}),*);
     }};
 );
 
@@ -232,3 +234,24 @@ macro_rules! scan(
         $crate::try_scan!(@impl unwrap; $input => $pattern, $($arg),*)
     }};
 );
+
+#[cfg(test)]
+mod tests {
+    use std::convert::Infallible;
+
+    use super::*;
+
+    /// dummy struct that does not implement Display
+    #[derive(Debug)]
+    struct NoDisplay;
+    impl FromStr for NoDisplay {
+        type Err = Infallible;
+        fn from_str(_: &str) -> Result<Self, Self::Err> {
+            Ok(Self)
+        }
+    }
+    #[test]
+    fn test_no_display() {
+        let _: NoDisplay = read!("{}", "".bytes());
+    }
+}
